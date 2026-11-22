@@ -1,11 +1,36 @@
 from app.models import Task
 
+
+# --- Task #03: Pattern Implementation Strategy ---
+class PriorityStrategy:
+    def get_weight(self) -> int:
+        raise NotImplementedError
+
+
+class HighPriorityStrategy(PriorityStrategy):
+    def get_weight(self) -> int:
+        return 1
+
+
+class DefaultPriorityStrategy(PriorityStrategy):
+    def get_weight(self) -> int:
+        return 3
+
+
 class TaskService:
     def __init__(self):
         self.tasks = []
+        self._strategies = {
+            "high": HighPriorityStrategy(),
+            "medium": DefaultPriorityStrategy(),
+            "low": DefaultPriorityStrategy(),
+        }
 
-    def create_task(self, title: str):
+    def create_task(self, title: str, priority: str = "medium"):
         task = Task(len(self.tasks) + 1, title)
+        task.priority = priority
+        strategy = self._strategies.get(priority, DefaultPriorityStrategy())
+        task.weight = strategy.get_weight()
         self.tasks.append(task)
         return task
 
