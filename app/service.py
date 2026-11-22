@@ -1,7 +1,6 @@
 from app.models import Task
 
 
-# --- Task #03: Pattern Implementation Strategy ---
 class PriorityStrategy:
     def get_weight(self) -> int:
         raise NotImplementedError
@@ -27,7 +26,11 @@ class TaskService:
         }
 
     def create_task(self, title: str, priority: str = "medium"):
-        task = Task(len(self.tasks) + 1, title)
+        # Fix for Risk R-01: Validation for empty or whitespace-only title
+        if not title or not title.strip():
+            raise ValueError("Task title cannot be empty.")
+
+        task = Task(len(self.tasks) + 1, title.strip())
         task.priority = priority
         strategy = self._strategies.get(priority, DefaultPriorityStrategy())
         task.weight = strategy.get_weight()
